@@ -214,7 +214,7 @@
 
     <!-- CREDENTIALS + MISSION -->
     {% if landing_credentials and professional.show_credentials or professional.mission and professional.show_mission %}
-    <section id="credenciales" class="py-6 sm:py-10 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-10">
+    <section id="credenciales" class="py-6 sm:py-10 grid grid-cols-1 {% if landing_credentials and professional.show_credentials and professional.mission and professional.show_mission %}md:grid-cols-2{% endif %} gap-4 sm:gap-10">
       {% if landing_credentials and professional.show_credentials %}
       <div class="bg-white p-6 sm:p-10 rounded-2xl ambient-shadow">
         <h2 class="mb-4 sm:mb-6 text-[var(--ink)]">Credenciales y formación</h2>
@@ -233,7 +233,7 @@
       {% endif %}
 
       {% if professional.mission and professional.show_mission %}
-      <div class="flex flex-col gap-6 {% if not landing_credentials or not professional.show_credentials %}md:col-span-2{% endif %}">
+      <div class="flex flex-col gap-6">
         <div class="bg-[var(--theme-primary)] text-white p-6 sm:p-10 rounded-2xl ambient-shadow flex-1">
           <h3 class="mb-3 sm:mb-4 text-white">Mi misión</h3>
           <p class="body-md italic opacity-95 leading-relaxed">"{{ professional.mission }}"</p>

@@ -60,6 +60,28 @@
     .clinical .body-sm { font-size: 14px; }
   }
   .clinical .ambient-shadow { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05); }
+  .clinical .carousel {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+    scroll-padding-left: 0;
+  }
+  .clinical .carousel::-webkit-scrollbar { display: none; }
+  .clinical .carousel > * { scroll-snap-align: start; flex-shrink: 0; }
+  @media (min-width: 640px) { .clinical .carousel { gap: 24px; } }
+  .clinical .carousel-edge {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  @media (min-width: 640px) {
+    .clinical .carousel-edge { margin-left: -24px; margin-right: -24px; padding-left: 24px; padding-right: 24px; }
+  }
   .clinical .material-symbols-outlined { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 24px; line-height: 1; display: inline-block; -webkit-font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; }
   .clinical .star-fill { font-variation-settings: 'FILL' 1; font-size: 18px; }
   .clinical *:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--theme-primary); border-radius: 8px; }
@@ -237,9 +259,9 @@
         <h2 class="mb-3 sm:mb-4 text-[var(--ink)]">Servicios</h2>
         <p class="body-md text-[var(--slate-500)] max-w-xl mx-auto">Áreas en las que acompaño a mis pacientes.</p>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+      <div class="carousel carousel-edge">
         {% for svc in landing_services %}
-        <div class="bg-white rounded-2xl border border-[var(--slate-200)] hover:border-[var(--theme-primary)] transition-all group ambient-shadow flex flex-col overflow-hidden">
+        <div class="bg-white rounded-2xl border border-[var(--slate-200)] hover:border-[var(--theme-primary)] transition-all group ambient-shadow flex flex-col overflow-hidden w-[280px] sm:w-[320px] md:w-[380px]">
           {% if svc.image %}
           <div class="w-full aspect-[16/10] overflow-hidden bg-[var(--slate-50)]">
             <img src="{{ svc.image.url }}" alt="{{ svc.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -282,13 +304,13 @@
         <h2 class="mb-3 sm:mb-4 text-[var(--ink)]">Lo que dicen mis pacientes</h2>
         <p class="body-md text-[var(--slate-500)]">Experiencias reales de quienes confiaron en este espacio.</p>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div class="carousel">
         {% for t in landing_testimonials %}
-        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-[var(--slate-200)]">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-[var(--slate-200)] w-[280px] sm:w-[320px] md:w-[380px] flex flex-col">
           <div class="flex text-[var(--theme-primary)] mb-3 sm:mb-4">
             {% for i in "12345" %}{% if forloop.counter <= t.rating %}<span class="material-symbols-outlined star-fill">star</span>{% endif %}{% endfor %}
           </div>
-          <p class="body-md italic mb-4 sm:mb-6 text-[var(--ink)]">"{{ t.quote }}"</p>
+          <p class="body-md italic mb-4 sm:mb-6 text-[var(--ink)] flex-1">"{{ t.quote }}"</p>
           <div class="flex items-center gap-3 sm:gap-4 min-w-0">
             <div class="w-10 h-10 bg-[var(--slate-100)] rounded-full flex items-center justify-center text-[var(--slate-500)] font-bold shrink-0">
               {{ t.author_name|first|upper }}

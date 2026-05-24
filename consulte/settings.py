@@ -1,5 +1,5 @@
 """
-Django settings for clyra project (consulte.).
+Django settings for consulte project.
 """
 
 import os
@@ -54,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'clyra.urls'
+ROOT_URLCONF = 'consulte.urls'
 
 TEMPLATES = [
     {
@@ -71,7 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'clyra.wsgi.application'
+WSGI_APPLICATION = 'consulte.wsgi.application'
 
 
 # --- Database ---

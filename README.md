@@ -2,8 +2,6 @@
 
 Plataforma para que profesionales independientes (salud, legal, contable, coaching, consultoría, creativos) creen su landing pública y gestionen turnos online. Django 6 + Tailwind (CDN). Dominio: `consulte.app`.
 
-> El módulo Django interno sigue llamándose `clyra/` por compatibilidad con la configuración de deploy. La identidad visual y el nombre de producto son **consulte.** (lowercase + punto en Deep Slate).
-
 ## Desarrollo local
 
 ```powershell
@@ -33,7 +31,7 @@ Localmente todas tienen defaults sensatos. En producción setear:
 ## Estructura
 
 - `core/` — app principal: `Professional`, `Patient`, `Appointment` + 4 modelos repeater para landing
-- `clyra/` — config Django (urls, settings, wsgi)
+- `consulte/` — config Django (urls, settings, wsgi)
 - `templates/core/` — templates: dashboard, landing pública, admin de landing, etc.
 - `diseñostich/` — referencia de diseño Stitch ("Clinical Clarity") usada para el landing público
 

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Product is **consulte.** (lowercase + trailing dot, Deep Slate). Domain: `consulte.app`. SaaS horizontal for independent professionals (salud, legal, contable, coaching, creativos, bienestar) — public landing + online booking.
 
-The Django project module is still named `clyra/` for deploy compatibility — do **not** rename. `clyra/` = config; `core/` = the whole app.
+`consulte/` = Django config module (settings, urls, wsgi). `core/` = the application (models, views, templates, management commands).
 
 ## Common commands
 

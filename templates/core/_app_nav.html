@@ -39,6 +39,7 @@
       <span class="sep" aria-hidden="true"></span>
       <nav class="tabs" aria-label="Secciones">
         <a class="tab {% if active == 'agenda' %}tab-active{% endif %}" href="{% url 'dashboard' %}">Agenda</a>
+        <a class="tab {% if active == 'calendario' %}tab-active{% endif %}" href="{% url 'agenda' %}">Calendario</a>
         <a class="tab {% if active == 'clientes' %}tab-active{% endif %}" href="{% url 'patient_list' %}">Clientes</a>
         <a class="tab {% if active == 'pagina' %}tab-active{% endif %}" href="{% url 'landing_admin' %}">Página</a>
         {% if professional.role == 'owner' %}

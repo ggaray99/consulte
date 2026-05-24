@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% block title %}Calendario — consulte.{% endblock %}
+
+{% block navbar %}
+{% include 'core/_app_nav.html' with active='calendario' show_date=True %}
+{% endblock %}
+
+{% block content %}
+<style>
+  .cal {
+    --cobalt: #0047AB; --cobalt-dark: #00327D;
+    --cobalt-50: #F2F5FC; --cobalt-100: #DCE5F4;
+    --ink: #0B1C30; --bg-tint: #F8F9FF;
+    --slate-50: #F4F6FA; --slate-100: #E5E9F0;
+    --slate-200: #CBD2DD; --slate-300: #A2AEBE;
+    --slate-400: #6F7E92; --slate-500: #4A5A6E;
+    --success: #1E9E63; --warning: #D68419; --error: #C8362F;
+    font-family: 'Manrope', system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--bg-tint);
+    min-height: calc(100vh - 60px);
+  }
+  .cal .wrap { max-width: 1280px; margin: 0 auto; padding: 28px 24px; }
+  .cal h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 4px 0; }
+  .cal .subtitle { color: var(--slate-500); font-size: 14px; margin: 0 0 24px 0; }
+
+  .cal .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 18px;
+  }
+  .cal .month-nav { display: flex; align-items: center; gap: 8px; }
+  .cal .nav-btn {
+    width: 36px; height: 36px; border: 1px solid var(--slate-200); border-radius: 8px;
+    background: #fff; color: var(--slate-500); display: inline-flex; align-items: center; justify-content: center;
+    text-decoration: none; transition: all 150ms ease-out;
+  }
+  .cal .nav-btn:hover { border-color: var(--cobalt); color: var(--cobalt); background: var(--cobalt-50); }
+  .cal .month-label {
+    font-size: 18px; font-weight: 600; min-width: 200px; text-align: center;
+    text-transform: capitalize;
+  }
+  .cal .today-btn {
+    padding: 8px 14px; border: 1px solid var(--slate-200); border-radius: 8px;
+    background: #fff; color: var(--slate-700); font-size: 13px; font-weight: 500;
+    text-decoration: none; transition: all 150ms ease-out;
+  }
+  .cal .today-btn:hover { border-color: var(--cobalt); color: var(--cobalt); }
+  .cal .toggle {
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+    border: 1px solid var(--slate-200); border-radius: 8px; background: #fff;
+    color: var(--slate-700); font-size: 13px; text-decoration: none;
+    transition: all 150ms ease-out;
+  }
+  .cal .toggle.is-on { border-color: var(--cobalt); background: var(--cobalt-50); color: var(--cobalt); }
+  .cal .toggle:hover { border-color: var(--cobalt); }
+
+  .cal .grid-card {
+    background: #fff; border: 1px solid var(--slate-100); border-radius: 12px;
+    overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .cal .weekdays {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    background: var(--slate-50); border-bottom: 1px solid var(--slate-100);
+  }
+  .cal .weekday {
+    padding: 10px 8px; text-align: center; font-size: 11px; font-weight: 600;
+    color: var(--slate-500); text-transform: uppercase; letter-spacing: 0.08em;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .cal .week { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .cal .week:not(:last-child) { border-bottom: 1px solid var(--slate-100); }
+  .cal .day {
+    aspect-ratio: 1 / 1;
+    min-height: 76px;
+    padding: 8px 10px;
+    border-right: 1px solid var(--slate-100);
+    display: flex; flex-direction: column; gap: 4px;
+    text-decoration: none; color: inherit;
+    transition: background 120ms ease-out;
+    position: relative;
+  }
+  .cal .day:last-child { border-right: none; }
+  .cal .day:hover { background: var(--slate-50); }
+  .cal .day.is-out { color: var(--slate-300); background: #FAFBFC; }
+  .cal .day.is-out:hover { background: var(--slate-50); }
+  .cal .day.is-today .day-num {
+    background: var(--cobalt); color: #fff; border-radius: 50%;
+    width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700;
+  }
+  .cal .day.is-selected { background: var(--cobalt-50); box-shadow: inset 0 0 0 2px var(--cobalt); }
+  .cal .day-num { font-size: 13px; font-weight: 500; line-height: 1; }
+  .cal .day-count {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600;
+    background: var(--cobalt-100); color: var(--cobalt-dark);
+    padding: 2px 7px; border-radius: 10px; align-self: flex-start;
+    margin-top: auto;
+  }
+  .cal .day.is-out .day-count { opacity: 0.4; }
+
+  /* Day detail panel */
+  .cal .detail { margin-top: 22px; }
+  .cal .detail-card { background: #fff; border: 1px solid var(--slate-100); border-radius: 12px; padding: 22px 24px; }
+  .cal .detail-title { font-size: 16px; font-weight: 600; margin: 0 0 4px 0; text-transform: capitalize; }
+  .cal .detail-sub { font-size: 13px; color: var(--slate-500); margin: 0 0 16px 0; }
+  .cal .empty { color: var(--slate-400); font-size: 14px; padding: 12px 0; }
+  .cal .appt-row {
+    display: grid; grid-template-columns: 70px 1fr auto; gap: 16px;
+    padding: 12px 0; border-top: 1px solid var(--slate-100); align-items: center;
+  }
+  .cal .appt-row:first-child { border-top: none; }
+  .cal .appt-time {
+    font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600; color: var(--cobalt);
+  }
+  .cal .appt-main { min-width: 0; }
+  .cal .appt-patient { font-weight: 600; font-size: 14px; color: var(--ink); margin-bottom: 2px; }
+  .cal .appt-meta { font-size: 12px; color: var(--slate-500); }
+  .cal .appt-meta .sep { color: var(--slate-300); margin: 0 6px; }
+  .cal .status {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px;
+  }
+  .cal .status-scheduled { background: var(--cobalt-50); color: var(--cobalt-dark); }
+  .cal .status-confirmed { background: #E6F4EC; color: var(--success); }
+  .cal .status-completed { background: var(--slate-100); color: var(--slate-500); }
+  .cal .status-cancelled { background: #FBE7E5; color: var(--error); }
+  .cal .appt-link {
+    font-size: 12px; color: var(--cobalt); text-decoration: none; padding: 4px 10px;
+    border: 1px solid var(--slate-200); border-radius: 6px; transition: all 150ms ease-out;
+  }
+  .cal .appt-link:hover { border-color: var(--cobalt); background: var(--cobalt-50); }
+
+  @media (max-width: 640px) {
+    .cal .wrap { padding: 18px 12px; }
+    .cal .day { min-height: 56px; padding: 6px 6px; }
+    .cal .day-num { font-size: 12px; }
+    .cal .day.is-today .day-num { width: 22px; height: 22px; font-size: 11px; }
+    .cal .day-count { font-size: 10px; padding: 1px 6px; }
+    .cal .month-label { font-size: 16px; min-width: 0; flex: 1; }
+    .cal .appt-row { grid-template-columns: 56px 1fr; gap: 10px; }
+    .cal .appt-link { grid-column: 1 / -1; justify-self: start; }
+  }
+</style>
+
+<div class="cal">
+  <div class="wrap">
+    <h1>Calendario</h1>
+    <p class="subtitle">Navegá por mes y abrí cualquier día para ver los turnos.</p>
+
+    <div class="toolbar">
+      <div class="month-nav">
+        <a href="?month={{ prev_month_ym }}{% if not show_cancelled %}&show_cancelled=0{% endif %}" class="nav-btn" aria-label="Mes anterior">
+          <span class="material-symbols-outlined" style="font-size:20px;">chevron_left</span>
+        </a>
+        <span class="month-label">{{ current_month_label }}</span>
+        <a href="?month={{ next_month_ym }}{% if not show_cancelled %}&show_cancelled=0{% endif %}" class="nav-btn" aria-label="Mes siguiente">
+          <span class="material-symbols-outlined" style="font-size:20px;">chevron_right</span>
+        </a>
+        {% if current_month_ym != today_ym %}
+        <a href="?month={{ today_ym }}&date={{ today|date:'Y-m-d' }}{% if not show_cancelled %}&show_cancelled=0{% endif %}" class="today-btn">Hoy</a>
+        {% endif %}
+      </div>
+      <a href="?month={{ current_month_ym }}{% if selected_date %}&date={{ selected_date|date:'Y-m-d' }}{% endif %}{% if show_cancelled %}&show_cancelled=0{% endif %}"
+         class="toggle {% if show_cancelled %}is-on{% endif %}">
+        <span class="material-symbols-outlined" style="font-size:16px;">{% if show_cancelled %}check_box{% else %}check_box_outline_blank{% endif %}</span>
+        Mostrar cancelados
+      </a>
+    </div>
+
+    <div class="grid-card">
+      <div class="weekdays">
+        <div class="weekday">Lun</div>
+        <div class="weekday">Mar</div>
+        <div class="weekday">Mié</div>
+        <div class="weekday">Jue</div>
+        <div class="weekday">Vie</div>
+        <div class="weekday">Sáb</div>
+        <div class="weekday">Dom</div>
+      </div>
+      {% for week in weeks %}
+      <div class="week">
+        {% for d in week %}
+        <a href="?month={{ current_month_ym }}&date={{ d.date|date:'Y-m-d' }}{% if not show_cancelled %}&show_cancelled=0{% endif %}"
+           class="day {% if not d.in_month %}is-out{% endif %} {% if d.is_today %}is-today{% endif %} {% if d.is_selected %}is-selected{% endif %}">
+          <span class="day-num">{{ d.date|date:"j" }}</span>
+          {% if d.count %}
+          <span class="day-count">{{ d.count }}</span>
+          {% endif %}
+        </a>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if selected_date %}
+    <div class="detail">
+      <div class="detail-card">
+        <p class="detail-title">{{ selected_date|date:"l d \d\e F" }}</p>
+        <p class="detail-sub">{{ selected_appts|length }} turno{{ selected_appts|length|pluralize }}{% if not show_cancelled %} (cancelados ocultos){% endif %}</p>
+        {% if selected_appts %}
+          {% for a in selected_appts %}
+          <div class="appt-row">
+            <span class="appt-time">{{ a.appointment_time|time:"H:i" }}</span>
+            <div class="appt-main">
+              <p class="appt-patient">{{ a.patient.first_name }} {{ a.patient.last_name }}</p>
+              <p class="appt-meta">
+                <span class="status status-{{ a.status }}">{{ a.get_status_display }}</span>
+                <span class="sep">·</span>
+                {% if a.mode == 'online' %}Videollamada{% else %}Presencial{% endif %}
+                {% if a.service %}<span class="sep">·</span>{{ a.service.title }}{% endif %}
+              </p>
+            </div>
+            <a href="{% url 'appointment_detail' a.id %}" class="appt-link">Ver detalle</a>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="empty">No hay turnos este día.</p>
+        {% endif %}
+      </div>
+    </div>
+    {% else %}
+    <div class="detail">
+      <div class="detail-card" style="text-align:center;">
+        <p class="empty">Hacé click en un día del calendario para ver los turnos.</p>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,400,0,0&display=swap" rel="stylesheet">
+{% endblock %}

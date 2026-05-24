@@ -409,6 +409,100 @@ def appointment_status(request, appointment_id):
     return redirect('dashboard')
 
 
+MONTH_NAMES_ES = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+]
+
+
+@login_required
+def agenda(request):
+    """Month-grid calendar view of all the pro's appointments, with per-day detail."""
+    professional = get_professional(request)
+    if not professional:
+        return redirect('setup')
+
+    today = date.today()
+
+    month_str = request.GET.get('month', '')
+    try:
+        y, m = month_str.split('-')
+        current_month = date(int(y), int(m), 1)
+    except (ValueError, AttributeError):
+        current_month = date(today.year, today.month, 1)
+
+    selected_date = None
+    selected_str = request.GET.get('date', '')
+    if selected_str:
+        try:
+            selected_date = datetime.strptime(selected_str, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+
+    show_cancelled = request.GET.get('show_cancelled', '1') != '0'
+
+    from calendar import monthrange
+    last_day_num = monthrange(current_month.year, current_month.month)[1]
+    first_day = current_month
+    last_day = date(current_month.year, current_month.month, last_day_num)
+    grid_start = first_day - timedelta(days=first_day.weekday())
+    grid_end = last_day + timedelta(days=(6 - last_day.weekday()))
+
+    appts_qs = Appointment.objects.filter(
+        professional=professional,
+        appointment_date__gte=grid_start,
+        appointment_date__lte=grid_end,
+    ).select_related('patient', 'service')
+    if not show_cancelled:
+        appts_qs = appts_qs.exclude(status='cancelled')
+    appts = list(appts_qs)
+
+    counts_by_date = {}
+    for a in appts:
+        counts_by_date[a.appointment_date] = counts_by_date.get(a.appointment_date, 0) + 1
+
+    weeks = []
+    week = []
+    cursor = grid_start
+    while cursor <= grid_end:
+        week.append({
+            'date': cursor,
+            'in_month': cursor.month == current_month.month,
+            'is_today': cursor == today,
+            'is_selected': selected_date is not None and cursor == selected_date,
+            'count': counts_by_date.get(cursor, 0),
+        })
+        if cursor.weekday() == 6:
+            weeks.append(week)
+            week = []
+        cursor += timedelta(days=1)
+    if week:
+        weeks.append(week)
+
+    selected_appts = sorted(
+        [a for a in appts if a.appointment_date == selected_date],
+        key=lambda a: a.appointment_time,
+    ) if selected_date else []
+
+    prev_month_anchor = (current_month - timedelta(days=1)).replace(day=1)
+    next_month_anchor = (current_month.replace(day=last_day_num) + timedelta(days=1)).replace(day=1)
+
+    return render(request, 'core/agenda.html', {
+        'professional': professional,
+        'current_month': current_month,
+        'current_month_label': f'{MONTH_NAMES_ES[current_month.month - 1]} {current_month.year}',
+        'current_month_ym': current_month.strftime('%Y-%m'),
+        'weeks': weeks,
+        'selected_date': selected_date,
+        'selected_appts': selected_appts,
+        'show_cancelled': show_cancelled,
+        'prev_month_ym': prev_month_anchor.strftime('%Y-%m'),
+        'next_month_ym': next_month_anchor.strftime('%Y-%m'),
+        'today_ym': today.strftime('%Y-%m'),
+        'today': today,
+    })
+
+
 @login_required
 def patient_list(request):
     professional = get_professional(request)

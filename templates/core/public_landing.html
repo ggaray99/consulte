@@ -73,15 +73,6 @@
   .clinical .carousel::-webkit-scrollbar { display: none; }
   .clinical .carousel > * { scroll-snap-align: start; flex-shrink: 0; }
   @media (min-width: 640px) { .clinical .carousel { gap: 24px; } }
-  .clinical .carousel-edge {
-    margin-left: -16px;
-    margin-right: -16px;
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-  @media (min-width: 640px) {
-    .clinical .carousel-edge { margin-left: -24px; margin-right: -24px; padding-left: 24px; padding-right: 24px; }
-  }
   .clinical .material-symbols-outlined { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; font-size: 24px; line-height: 1; display: inline-block; -webkit-font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; }
   .clinical .star-fill { font-variation-settings: 'FILL' 1; font-size: 18px; }
   .clinical *:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--theme-primary); border-radius: 8px; }
@@ -254,7 +245,7 @@
 
     <!-- SERVICES -->
     {% if landing_services and professional.show_services %}
-    <section id="servicios" class="py-6 sm:py-10">
+    <section id="servicios" class="my-6 sm:my-10 bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-10 ambient-shadow">
       <div class="mb-6 sm:mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
         <div class="text-center md:text-left">
           <h2 class="mb-3 sm:mb-4 text-[var(--ink)]">Servicios</h2>
@@ -271,7 +262,7 @@
           </button>
         </div>
       </div>
-      <div class="carousel carousel-edge" id="carousel-services">
+      <div class="carousel" id="carousel-services">
         {% for svc in landing_services %}
         <div class="bg-white rounded-2xl border border-[var(--slate-200)] hover:border-[var(--theme-primary)] transition-all group ambient-shadow flex flex-col overflow-hidden w-[280px] sm:w-[320px] md:w-[380px]">
           {% if svc.image %}

@@ -52,9 +52,9 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Vertical</label>
                 <select name="vertical" class="w-full md:w-auto border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none">
                     <option value="">— Sin asignar —</option>
-                    {% for value, label in settings_form.fields.vertical.choices %}{% if value %}
+                    {% for value, label in vertical_choices %}
                     <option value="{{ value }}" {% if professional.vertical == value %}selected{% endif %}>{{ label }}</option>
-                    {% endif %}{% endfor %}
+                    {% endfor %}
                 </select>
                 <p class="text-xs text-gray-400 mt-1">Categoriza tu landing y, si dejás el color principal en cobalto, aplica el tint del rubro como acento.</p>
             </div>

@@ -18,6 +18,7 @@ from .models import (
     Professional, Patient, Appointment, Organization, OrganizationInvitation,
     Subscription,
     LandingStat, LandingCredential, LandingService, LandingTestimonial,
+    VERTICAL_CHOICES,
 )
 from .forms import (
     ProfessionalSetupForm, BookingPatientForm, PatientForm,
@@ -601,6 +602,7 @@ def landing_admin(request):
         'services': professional.landing_services.all(),
         'testimonials': testimonials_qs.filter(is_approved=True),
         'pending_testimonials': testimonials_qs.filter(is_approved=False),
+        'vertical_choices': VERTICAL_CHOICES,
         'public_url': request.build_absolute_uri(f'/p/{professional.slug}/'),
     })
 

@@ -29,7 +29,7 @@ from .forms import (
 from .emails import send_appointment_confirmation, send_clinic_invitation
 
 
-REVIEW_TOKEN_SALT = 'clyra.appointment.review'
+REVIEW_TOKEN_SALT = 'consulte.appointment.review'
 REVIEW_TOKEN_MAX_AGE = 60 * 24 * 60 * 60  # 60 days
 
 

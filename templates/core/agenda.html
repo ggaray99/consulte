@@ -98,8 +98,13 @@
   }
   .cal .day.is-out .day-count { opacity: 0.4; }
 
+  /* Layout: calendar left, day detail right (desktop) — stacked on mobile/tablet */
+  .cal .layout { display: grid; grid-template-columns: 1fr; gap: 22px; align-items: start; }
+  @media (min-width: 1024px) {
+    .cal .layout { grid-template-columns: minmax(0, 1fr) 340px; }
+  }
+
   /* Day detail panel */
-  .cal .detail { margin-top: 22px; }
   .cal .detail-card { background: #fff; border: 1px solid var(--slate-100); border-radius: 12px; padding: 22px 24px; }
   .cal .detail-title { font-size: 16px; font-weight: 600; margin: 0 0 4px 0; text-transform: capitalize; }
   .cal .detail-sub { font-size: 13px; color: var(--slate-500); margin: 0 0 16px 0; }
@@ -167,7 +172,8 @@
       </a>
     </div>
 
-    <div class="grid-card">
+    <div class="layout">
+      <div class="grid-card">
       <div class="weekdays">
         <div class="weekday">Lun</div>
         <div class="weekday">Mar</div>
@@ -190,10 +196,9 @@
         {% endfor %}
       </div>
       {% endfor %}
-    </div>
+      </div>
 
-    {% if selected_date %}
-    <div class="detail">
+      {% if selected_date %}
       <div class="detail-card">
         <p class="detail-title">{{ selected_date|date:"l d \d\e F" }}</p>
         <p class="detail-sub">{{ selected_appts|length }} turno{{ selected_appts|length|pluralize }}{% if not show_cancelled %} (cancelados ocultos){% endif %}</p>
@@ -217,14 +222,12 @@
           <p class="empty">No hay turnos este día.</p>
         {% endif %}
       </div>
-    </div>
-    {% else %}
-    <div class="detail">
+      {% else %}
       <div class="detail-card" style="text-align:center;">
         <p class="empty">Hacé click en un día del calendario para ver los turnos.</p>
       </div>
+      {% endif %}
     </div>
-    {% endif %}
   </div>
 </div>
 

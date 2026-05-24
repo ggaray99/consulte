@@ -255,19 +255,22 @@
     <!-- SERVICES -->
     {% if landing_services and professional.show_services %}
     <section id="servicios" class="py-6 sm:py-10">
-      <div class="text-center mb-6 sm:mb-10">
-        <h2 class="mb-3 sm:mb-4 text-[var(--ink)]">Servicios</h2>
-        <p class="body-md text-[var(--slate-500)] max-w-xl mx-auto">Áreas en las que acompaño a mis pacientes.</p>
+      <div class="mb-6 sm:mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div class="text-center md:text-left">
+          <h2 class="mb-3 sm:mb-4 text-[var(--ink)]">Servicios</h2>
+          <p class="body-md text-[var(--slate-500)] max-w-xl mx-auto md:mx-0">Áreas en las que acompaño a mis pacientes.</p>
+        </div>
+        <div class="hidden md:flex gap-2 shrink-0">
+          <button type="button" onclick="scrollCarousel('carousel-services', -1)" aria-label="Anterior"
+                  class="w-9 h-9 border border-[var(--slate-200)] rounded-full flex items-center justify-center text-[var(--slate-500)] hover:border-[var(--theme-primary)] hover:text-[var(--theme-primary)] transition">
+            <span class="material-symbols-outlined" style="font-size:18px;">chevron_left</span>
+          </button>
+          <button type="button" onclick="scrollCarousel('carousel-services', 1)" aria-label="Siguiente"
+                  class="w-9 h-9 border border-[var(--slate-200)] rounded-full flex items-center justify-center text-[var(--slate-500)] hover:border-[var(--theme-primary)] hover:text-[var(--theme-primary)] transition">
+            <span class="material-symbols-outlined" style="font-size:18px;">chevron_right</span>
+          </button>
+        </div>
       </div>
-      <div class="relative">
-      <button type="button" onclick="scrollCarousel('carousel-services', -1)" aria-label="Anterior"
-              class="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 bg-white rounded-full ambient-shadow border border-[var(--slate-200)] items-center justify-center text-[var(--ink)] hover:bg-[var(--theme-primary)] hover:text-white hover:border-[var(--theme-primary)] transition">
-        <span class="material-symbols-outlined">chevron_left</span>
-      </button>
-      <button type="button" onclick="scrollCarousel('carousel-services', 1)" aria-label="Siguiente"
-              class="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 w-11 h-11 bg-white rounded-full ambient-shadow border border-[var(--slate-200)] items-center justify-center text-[var(--ink)] hover:bg-[var(--theme-primary)] hover:text-white hover:border-[var(--theme-primary)] transition">
-        <span class="material-symbols-outlined">chevron_right</span>
-      </button>
       <div class="carousel carousel-edge" id="carousel-services">
         {% for svc in landing_services %}
         <div class="bg-white rounded-2xl border border-[var(--slate-200)] hover:border-[var(--theme-primary)] transition-all group ambient-shadow flex flex-col overflow-hidden w-[280px] sm:w-[320px] md:w-[380px]">
@@ -303,26 +306,28 @@
         </div>
         {% endfor %}
       </div>
-      </div>
     </section>
     {% endif %}
 
     <!-- TESTIMONIALS -->
     {% if landing_testimonials and professional.show_testimonials %}
     <section id="testimonios" class="my-6 sm:my-10 bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-10 ambient-shadow">
-      <div class="mb-6 sm:mb-10">
-        <h2 class="mb-3 sm:mb-4 text-[var(--ink)]">Lo que dicen mis pacientes</h2>
-        <p class="body-md text-[var(--slate-500)]">Experiencias reales de quienes confiaron en este espacio.</p>
+      <div class="mb-6 sm:mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <h2 class="mb-3 sm:mb-4 text-[var(--ink)]">Lo que dicen mis pacientes</h2>
+          <p class="body-md text-[var(--slate-500)]">Experiencias reales de quienes confiaron en este espacio.</p>
+        </div>
+        <div class="hidden md:flex gap-2 shrink-0">
+          <button type="button" onclick="scrollCarousel('carousel-testimonials', -1)" aria-label="Anterior"
+                  class="w-9 h-9 border border-[var(--slate-200)] rounded-full flex items-center justify-center text-[var(--slate-500)] hover:border-[var(--theme-primary)] hover:text-[var(--theme-primary)] transition">
+            <span class="material-symbols-outlined" style="font-size:18px;">chevron_left</span>
+          </button>
+          <button type="button" onclick="scrollCarousel('carousel-testimonials', 1)" aria-label="Siguiente"
+                  class="w-9 h-9 border border-[var(--slate-200)] rounded-full flex items-center justify-center text-[var(--slate-500)] hover:border-[var(--theme-primary)] hover:text-[var(--theme-primary)] transition">
+            <span class="material-symbols-outlined" style="font-size:18px;">chevron_right</span>
+          </button>
+        </div>
       </div>
-      <div class="relative">
-      <button type="button" onclick="scrollCarousel('carousel-testimonials', -1)" aria-label="Anterior"
-              class="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-11 h-11 bg-white rounded-full ambient-shadow border border-[var(--slate-200)] items-center justify-center text-[var(--ink)] hover:bg-[var(--theme-primary)] hover:text-white hover:border-[var(--theme-primary)] transition">
-        <span class="material-symbols-outlined">chevron_left</span>
-      </button>
-      <button type="button" onclick="scrollCarousel('carousel-testimonials', 1)" aria-label="Siguiente"
-              class="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-11 h-11 bg-white rounded-full ambient-shadow border border-[var(--slate-200)] items-center justify-center text-[var(--ink)] hover:bg-[var(--theme-primary)] hover:text-white hover:border-[var(--theme-primary)] transition">
-        <span class="material-symbols-outlined">chevron_right</span>
-      </button>
       <div class="carousel" id="carousel-testimonials">
         {% for t in landing_testimonials %}
         <div class="bg-white p-5 sm:p-6 rounded-2xl border border-[var(--slate-200)] w-[280px] sm:w-[320px] md:w-[380px] flex flex-col">
@@ -341,7 +346,6 @@
           </div>
         </div>
         {% endfor %}
-      </div>
       </div>
     </section>
     {% endif %}

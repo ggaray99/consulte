@@ -155,6 +155,8 @@ class Professional(models.Model):
     accepts_insurance = models.BooleanField('Acepta obra social', default=False)
     accepts_private = models.BooleanField('Acepta particular', default=True)
     profile_image = models.ImageField('Foto de perfil', upload_to='professionals/', blank=True, null=True)
+    hero_image = models.ImageField('Imagen de portada', upload_to='professionals/heroes/', blank=True, null=True,
+                                   help_text='Imagen full-screen del hero. Recomendado paisaje 1920×1080. Si la dejás vacía, se usa el layout de tarjeta clásico con la foto de perfil.')
     common_reasons = models.TextField('Motivos frecuentes de consulta', blank=True, help_text='Separados por coma. Ej: Ansiedad, Estrés, Autoestima')
     mission = models.TextField('Misión / Filosofía', blank=True, help_text='Frase destacada que aparece en la landing como tarjeta azul.')
     theme_primary = models.CharField('Color principal', max_length=7, default='#0047ab', validators=[HEX_COLOR_VALIDATOR],
@@ -311,7 +313,9 @@ class LandingCredential(models.Model):
 class LandingService(models.Model):
     professional = models.ForeignKey(Professional, on_delete=models.CASCADE, related_name='landing_services')
     icon = models.CharField('Icono Material', max_length=50, default='medical_services',
-                            help_text='Nombre de Material Symbol. Ej: monitor_heart, medical_services, video_chat')
+                            help_text='Nombre de Material Symbol. Se usa cuando no cargás imagen. Ej: monitor_heart, content_cut, fitness_center, brush.')
+    image = models.ImageField('Imagen', upload_to='landing_services/', blank=True, null=True,
+                              help_text='Foto del servicio (cuadrada o vertical, 800×800 o similar). Si la cargás, reemplaza el icono en la landing pública.')
     title = models.CharField('Título', max_length=100)
     description = models.TextField('Descripción')
     price = models.DecimalField('Precio', max_digits=10, decimal_places=2, null=True, blank=True,

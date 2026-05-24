@@ -105,9 +105,42 @@
     </nav>
   </header>
 
+  {% if professional.hero_image %}
+  <!-- HERO full-bleed (cuando hay imagen de portada) -->
+  <section id="sobre" class="relative w-full min-h-[80vh] sm:min-h-screen flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0 z-0">
+      <img src="{{ professional.hero_image.url }}" alt="{{ professional.professional_name }}" class="w-full h-full object-cover" style="filter:brightness(0.55);">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/40"></div>
+    </div>
+    <div class="relative z-10 text-center px-6 sm:px-8 max-w-4xl mx-auto py-20 sm:py-24">
+      <span class="label-caps inline-block bg-white/15 backdrop-blur-sm text-white px-3 py-1 rounded-full mb-5 sm:mb-6">{{ professional.specialty }}</span>
+      <h1 class="text-white mb-4 sm:mb-6" style="font-size:clamp(36px, 6vw, 72px); line-height:1.05; letter-spacing:-0.035em; font-weight:600;">
+        {% if professional.tagline %}{{ professional.tagline }}{% else %}{{ professional.professional_name }}{% endif %}
+      </h1>
+      {% if professional.bio %}
+      <p class="text-white/85 body-lg mb-8 sm:mb-10 max-w-2xl mx-auto">{{ professional.bio }}</p>
+      {% endif %}
+      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+        <a href="#reservar-turno" class="bg-[var(--theme-primary)] text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-lg body-md font-semibold hover:opacity-90 transition-all inline-flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined">calendar_today</span> Reservar turno
+        </a>
+        {% if landing_services %}
+        <a href="#servicios" class="border border-white/40 backdrop-blur-sm text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-lg body-md font-semibold hover:bg-white/10 transition-all text-center">
+          Ver servicios
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    <a href="#servicios" class="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/60 hover:text-white/90 transition-colors hidden sm:block" aria-label="Bajar">
+      <span class="material-symbols-outlined" style="font-size:32px;">expand_more</span>
+    </a>
+  </section>
+  {% endif %}
+
   <main class="max-w-[1440px] mx-auto px-4 sm:px-6">
 
-    <!-- HERO -->
+    {% if not professional.hero_image %}
+    <!-- HERO clásico (fallback cuando no hay imagen de portada) -->
     <section id="sobre" class="py-6 sm:py-10 grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 items-stretch">
       <div class="md:col-span-7 flex flex-col justify-center bg-white p-6 sm:p-10 rounded-2xl ambient-shadow">
         <span class="label-caps text-[var(--theme-primary)] mb-3 sm:mb-4">{{ professional.specialty }}</span>
@@ -150,6 +183,7 @@
         </div>
       </div>
     </section>
+    {% endif %}
 
     <!-- STATS -->
     {% if landing_stats and professional.show_stats %}
@@ -205,16 +239,34 @@
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         {% for svc in landing_services %}
-        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-[var(--slate-200)] hover:border-[var(--theme-primary)] transition-all group ambient-shadow flex flex-col">
-          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-lg bg-[var(--slate-50)] flex items-center justify-center text-[var(--theme-primary)] mb-3 sm:mb-4 group-hover:bg-[var(--theme-primary)] group-hover:text-white transition-colors">
-            <span class="material-symbols-outlined">{{ svc.icon }}</span>
+        <div class="bg-white rounded-2xl border border-[var(--slate-200)] hover:border-[var(--theme-primary)] transition-all group ambient-shadow flex flex-col overflow-hidden">
+          {% if svc.image %}
+          <div class="w-full aspect-[16/10] overflow-hidden bg-[var(--slate-50)]">
+            <img src="{{ svc.image.url }}" alt="{{ svc.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
           </div>
-          <h3 class="font-bold mb-2 text-[var(--ink)]">{{ svc.title }}</h3>
-          <p class="body-sm text-[var(--slate-500)]">{{ svc.description }}</p>
-          {% if svc.formatted_price %}
-          <div class="mt-auto pt-4 flex items-baseline gap-2">
-            <span class="text-lg font-bold text-[var(--ink)]" style="letter-spacing:-0.01em;">{{ svc.formatted_price }}</span>
-            {% if svc.is_bookable %}<span class="body-sm text-[var(--slate-400)]">· por sesión</span>{% endif %}
+          <div class="p-5 sm:p-6 flex flex-col flex-1">
+            <h3 class="font-bold mb-2 text-[var(--ink)]">{{ svc.title }}</h3>
+            <p class="body-sm text-[var(--slate-500)]">{{ svc.description }}</p>
+            {% if svc.formatted_price %}
+            <div class="mt-auto pt-4 flex items-baseline gap-2">
+              <span class="text-lg font-bold text-[var(--ink)]" style="letter-spacing:-0.01em;">{{ svc.formatted_price }}</span>
+              {% if svc.is_bookable %}<span class="body-sm text-[var(--slate-400)]">· por sesión</span>{% endif %}
+            </div>
+            {% endif %}
+          </div>
+          {% else %}
+          <div class="p-5 sm:p-6 flex flex-col flex-1">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-lg bg-[var(--slate-50)] flex items-center justify-center text-[var(--theme-primary)] mb-3 sm:mb-4 group-hover:bg-[var(--theme-primary)] group-hover:text-white transition-colors">
+              <span class="material-symbols-outlined">{{ svc.icon }}</span>
+            </div>
+            <h3 class="font-bold mb-2 text-[var(--ink)]">{{ svc.title }}</h3>
+            <p class="body-sm text-[var(--slate-500)]">{{ svc.description }}</p>
+            {% if svc.formatted_price %}
+            <div class="mt-auto pt-4 flex items-baseline gap-2">
+              <span class="text-lg font-bold text-[var(--ink)]" style="letter-spacing:-0.01em;">{{ svc.formatted_price }}</span>
+              {% if svc.is_bookable %}<span class="body-sm text-[var(--slate-400)]">· por sesión</span>{% endif %}
+            </div>
+            {% endif %}
           </div>
           {% endif %}
         </div>

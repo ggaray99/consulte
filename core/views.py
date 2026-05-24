@@ -571,7 +571,7 @@ def landing_admin(request):
             anchor = f'/dashboard/landing/#{section}s'
             if action == f'{section}_add':
                 instance = Model(professional=professional)
-                form = FormCls(request.POST, instance=instance)
+                form = FormCls(request.POST, request.FILES, instance=instance)
                 if form.is_valid():
                     form.save()
                     messages.success(request, f'Item agregado.')
@@ -581,7 +581,7 @@ def landing_admin(request):
 
             if action == f'{section}_save':
                 obj = get_object_or_404(Model, id=request.POST.get('id'), professional=professional)
-                form = FormCls(request.POST, instance=obj)
+                form = FormCls(request.POST, request.FILES, instance=obj)
                 if form.is_valid():
                     form.save()
                     messages.success(request, 'Cambios guardados.')

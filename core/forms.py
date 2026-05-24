@@ -73,7 +73,7 @@ class LandingSettingsForm(forms.ModelForm):
 class BasicsForm(forms.ModelForm):
     class Meta:
         model = Professional
-        fields = ['professional_name', 'specialty', 'tagline', 'bio', 'profile_image',
+        fields = ['professional_name', 'specialty', 'tagline', 'bio', 'profile_image', 'hero_image',
                   'cancellation_window_hours']
 
 
@@ -98,7 +98,7 @@ class LandingCredentialForm(forms.ModelForm):
 class LandingServiceForm(forms.ModelForm):
     class Meta:
         model = LandingService
-        fields = ['icon', 'title', 'description', 'price', 'is_bookable', 'order']
+        fields = ['icon', 'image', 'title', 'description', 'price', 'is_bookable', 'order']
 
 
 class LandingTestimonialForm(forms.ModelForm):

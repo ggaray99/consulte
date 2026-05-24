@@ -1,0 +1,12 @@
+TURNO REAGENDADO POR EL PACIENTE
+
+Hola {{ professional.professional_name }},
+
+{{ patient.first_name }} {{ patient.last_name }} cambió la fecha de su turno.
+
+PACIENTE:    {{ patient.first_name }} {{ patient.last_name }}{% if patient.phone %} — {{ patient.phone }}{% endif %}
+ANTES:       {{ old_date|date:"l d/m/Y" }} · {{ old_time|time:"H:i" }} hs
+AHORA:       {{ appointment.appointment_date|date:"l d/m/Y" }} · {{ appointment.appointment_time|time:"H:i" }} hs
+
+—
+powered by consulte.

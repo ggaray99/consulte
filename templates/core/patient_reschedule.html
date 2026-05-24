@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Reagendar turno — {{ professional.professional_name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-12">
+    <div class="max-w-2xl mx-auto px-6">
+        <a href="{% url 'patient_appointment' token %}" class="text-primary-600 text-sm hover:underline mb-4 inline-block">&larr; Volver</a>
+        <h1 class="text-2xl font-semibold tracking-tight mb-1">Reagendar tu turno</h1>
+        <p class="text-gray-500 mb-2">{{ professional.professional_name }}{% if professional.specialty %} — {{ professional.specialty }}{% endif %}</p>
+        <p class="text-sm text-gray-500 mb-8">Tu turno actual: <span class="font-medium text-gray-700">{{ appointment.appointment_date|date:"l d/m/Y" }} a las {{ appointment.appointment_time|time:"H:i" }} hs</span></p>
+
+        {% if messages %}
+            {% for m in messages %}
+            <div class="mb-4 px-4 py-3 rounded-lg text-sm bg-red-50 text-red-800 border border-red-200">{{ m }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
+            <h2 class="font-medium mb-5">1. Elegí una nueva fecha</h2>
+            <div class="flex flex-wrap gap-2">
+                {% for d in available_dates %}
+                <a href="?date={{ d|date:'Y-m-d' }}"
+                   class="px-4 py-2 rounded-lg border text-sm {% if selected_date == d %}bg-primary-600 text-white border-primary-600{% else %}border-gray-200 hover:border-primary-400 hover:bg-primary-50{% endif %}">
+                    {{ d|date:"D d/m" }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if selected_date %}
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+            <h2 class="font-medium mb-5">2. Elegí un nuevo horario</h2>
+            {% if slots %}
+            <form method="post" id="rescheduleForm">
+                {% csrf_token %}
+                <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+                <input type="hidden" name="time" id="selectedTime" value="">
+                <div class="flex flex-wrap gap-2 mb-6">
+                    {% for slot in slots %}
+                    <button type="button" onclick="selectTime('{{ slot|time:'H:i' }}', this)"
+                            class="time-btn px-4 py-2 rounded-lg border border-gray-200 text-sm hover:border-primary-400 hover:bg-primary-50">
+                        {{ slot|time:"H:i" }}
+                    </button>
+                    {% endfor %}
+                </div>
+                <button type="submit" id="submitBtn" disabled
+                        class="w-full bg-primary-500 text-white font-semibold py-3 rounded-lg hover:bg-primary-600 disabled:opacity-40 disabled:cursor-not-allowed">
+                    Confirmar nuevo horario
+                </button>
+            </form>
+            {% else %}
+            <p class="text-gray-400">No hay horarios disponibles para este día.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function selectTime(time, btn) {
+    document.querySelectorAll('.time-btn').forEach(b => {
+        b.classList.remove('bg-primary-600', 'text-white', 'border-primary-600');
+        b.classList.add('border-gray-200');
+    });
+    btn.classList.add('bg-primary-600', 'text-white', 'border-primary-600');
+    btn.classList.remove('border-gray-200');
+    document.getElementById('selectedTime').value = time;
+    document.getElementById('submitBtn').disabled = false;
+}
+</script>
+{% endblock %}

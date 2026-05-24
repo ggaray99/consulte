@@ -12,10 +12,13 @@ MODALIDAD:   {% if appointment.mode == 'online' %}Videollamada{% else %}Presenci
 {% endif %}{% if appointment.mode == 'online' and appointment.meeting_url %}
 LINK DE LA VIDEOLLAMADA:
 {{ appointment.meeting_url }}
-{% endif %}{% if landing_url %}
-Ver consultorio: {{ landing_url }}
+{% endif %}{% if manage_url %}
+Gestionar tu turno (cancelar o reagendar):
+{{ manage_url }}
+
+{% endif %}{% if landing_url %}Ver consultorio: {{ landing_url }}
 {% endif %}
-Si necesitás reprogramar o cancelar, contactá a {{ professional.professional_name }}{% if professional.phone %} al {{ professional.phone }}{% endif %}{% if professional.email %} o por email a {{ professional.email }}{% endif %}.
+{% if manage_url %}También podés escribir a {{ professional.professional_name }}{% if professional.phone %} al {{ professional.phone }}{% endif %}{% if professional.email %} o por email a {{ professional.email }}{% endif %}.{% else %}Si necesitás reprogramar o cancelar, contactá a {{ professional.professional_name }}{% if professional.phone %} al {{ professional.phone }}{% endif %}{% if professional.email %} o por email a {{ professional.email }}{% endif %}.{% endif %}
 
 —
 {% if professional.specialty %}{{ professional.specialty }}{% endif %}{% if professional.specialty and professional.address %} · {% endif %}{% if professional.address %}{{ professional.address }}{% endif %}

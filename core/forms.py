@@ -73,7 +73,8 @@ class LandingSettingsForm(forms.ModelForm):
 class BasicsForm(forms.ModelForm):
     class Meta:
         model = Professional
-        fields = ['professional_name', 'specialty', 'tagline', 'bio', 'profile_image']
+        fields = ['professional_name', 'specialty', 'tagline', 'bio', 'profile_image',
+                  'cancellation_window_hours']
 
 
 class SocialLinksForm(forms.ModelForm):

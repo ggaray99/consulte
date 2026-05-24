@@ -10,6 +10,8 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.urls import reverse
 
+from .tokens import make_patient_token
+
 logger = logging.getLogger(__name__)
 
 
@@ -30,6 +32,15 @@ def _absolute_profile_image_url(professional, request=None):
         return request.build_absolute_uri(url)
     if settings.SITE_BASE_URL:
         return f'{settings.SITE_BASE_URL}{url}'
+    return ''
+
+
+def _absolute_patient_url(appointment, request=None):
+    path = reverse('patient_appointment', kwargs={'token': make_patient_token(appointment)})
+    if request is not None:
+        return request.build_absolute_uri(path)
+    if settings.SITE_BASE_URL:
+        return f'{settings.SITE_BASE_URL}{path}'
     return ''
 
 
@@ -120,6 +131,7 @@ def send_appointment_confirmation(appointment, request=None):
         'professional': professional,
         'landing_url': _absolute_landing_url(professional, request),
         'profile_image_url': _absolute_profile_image_url(professional, request),
+        'manage_url': _absolute_patient_url(appointment, request),
     }
 
     subject = (
@@ -143,4 +155,91 @@ def send_appointment_confirmation(appointment, request=None):
         return True
     except Exception:
         logger.exception('Failed to send appointment confirmation email')
+        return False
+
+
+def send_cancellation_to_pro(appointment, request=None):
+    """Notify the professional when a patient self-cancels their turn."""
+    api_key = settings.RESEND_API_KEY
+    if not api_key:
+        logger.info('Resend API key not set, skipping pro cancellation email.')
+        return False
+
+    professional = appointment.professional
+    if not professional.email:
+        return False
+
+    patient = appointment.patient
+    context = {
+        'appointment': appointment,
+        'patient': patient,
+        'professional': professional,
+    }
+
+    subject = (
+        f'Paciente canceló — {patient.first_name} {patient.last_name} · '
+        f'{appointment.appointment_date.strftime("%d/%m/%Y")} '
+        f'{appointment.appointment_time.strftime("%H:%M")}'
+    )
+    html_body = render_to_string('core/emails/appointment_cancelled_pro.html', context)
+    text_body = render_to_string('core/emails/appointment_cancelled_pro.txt', context)
+
+    try:
+        import resend
+        resend.api_key = api_key
+        resend.Emails.send({
+            'from': settings.DEFAULT_FROM_EMAIL,
+            'to': [professional.email],
+            'subject': subject,
+            'html': html_body,
+            'text': text_body,
+        })
+        return True
+    except Exception:
+        logger.exception('Failed to send cancellation email to pro')
+        return False
+
+
+def send_reschedule_to_pro(appointment, old_date, old_time, request=None):
+    """Notify the professional when a patient self-reschedules their turn."""
+    api_key = settings.RESEND_API_KEY
+    if not api_key:
+        logger.info('Resend API key not set, skipping pro reschedule email.')
+        return False
+
+    professional = appointment.professional
+    if not professional.email:
+        return False
+
+    patient = appointment.patient
+    context = {
+        'appointment': appointment,
+        'patient': patient,
+        'professional': professional,
+        'old_date': old_date,
+        'old_time': old_time,
+    }
+
+    subject = (
+        f'Paciente reagendó — {patient.first_name} {patient.last_name} · '
+        f'antes {old_date.strftime("%d/%m")} {old_time.strftime("%H:%M")} → '
+        f'ahora {appointment.appointment_date.strftime("%d/%m")} '
+        f'{appointment.appointment_time.strftime("%H:%M")}'
+    )
+    html_body = render_to_string('core/emails/appointment_rescheduled_pro.html', context)
+    text_body = render_to_string('core/emails/appointment_rescheduled_pro.txt', context)
+
+    try:
+        import resend
+        resend.api_key = api_key
+        resend.Emails.send({
+            'from': settings.DEFAULT_FROM_EMAIL,
+            'to': [professional.email],
+            'subject': subject,
+            'html': html_body,
+            'text': text_body,
+        })
+        return True
+    except Exception:
+        logger.exception('Failed to send reschedule email to pro')
         return False

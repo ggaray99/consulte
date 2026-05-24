@@ -180,6 +180,11 @@ class Professional(models.Model):
     start_time = models.TimeField('Hora de inicio')
     end_time = models.TimeField('Hora de fin')
     appointment_duration_minutes = models.IntegerField('Duración del turno (min)', default=30)
+    cancellation_window_hours = models.PositiveIntegerField(
+        'Anticipación mínima para cancelar/reagendar (horas)',
+        default=24,
+        help_text='El paciente puede cancelar o reagendar desde el link en su email hasta esta cantidad de horas antes del turno. 0 = sin restricción.',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -26,7 +26,12 @@ from .forms import (
     LandingServiceForm, LandingTestimonialForm, PublicReviewForm,
     OrganizationSetupForm, OrganizationBrandingForm, InvitationForm, JoinClinicForm,
 )
-from .emails import send_appointment_confirmation, send_clinic_invitation
+from .emails import (
+    send_appointment_confirmation, send_clinic_invitation,
+    send_cancellation_to_pro, send_reschedule_to_pro,
+)
+from .tokens import parse_patient_token
+from django.views.decorators.http import require_POST
 
 
 REVIEW_TOKEN_SALT = 'consulte.appointment.review'
@@ -697,6 +702,129 @@ def public_landing(request, slug):
 def booking(request, slug):
     """Legacy redirect — booking is now inline in public_landing."""
     return redirect('public_landing', slug=slug)
+
+
+def _appointment_datetime(appointment):
+    """Naive datetime of the appointment slot. Matches the project's naive date/time fields."""
+    return datetime.combine(appointment.appointment_date, appointment.appointment_time)
+
+
+def _is_window_locked(appointment):
+    """True if cancel/reschedule is blocked by the pro's anticipation policy or the turn already happened."""
+    appt_dt = _appointment_datetime(appointment)
+    now = datetime.now()
+    if appt_dt < now:
+        return True
+    window_hours = appointment.professional.cancellation_window_hours
+    if window_hours <= 0:
+        return False
+    return (appt_dt - now) < timedelta(hours=window_hours)
+
+
+def _patient_appointment_context(appointment, token):
+    can_act = (
+        appointment.status not in ('cancelled', 'completed')
+        and not _is_window_locked(appointment)
+    )
+    return {
+        'appointment': appointment,
+        'professional': appointment.professional,
+        'patient': appointment.patient,
+        'token': token,
+        'can_act': can_act,
+        'is_past': _appointment_datetime(appointment) < datetime.now(),
+    }
+
+
+def patient_appointment(request, token):
+    appointment = parse_patient_token(token)
+    if not appointment:
+        return render(request, 'core/patient_link_expired.html', status=410)
+    return render(request, 'core/patient_appointment.html', _patient_appointment_context(appointment, token))
+
+
+@require_POST
+def patient_cancel(request, token):
+    appointment = parse_patient_token(token)
+    if not appointment:
+        return render(request, 'core/patient_link_expired.html', status=410)
+    if appointment.status in ('cancelled', 'completed') or _is_window_locked(appointment):
+        return redirect('patient_appointment', token=token)
+
+    appointment.status = 'cancelled'
+    appointment.save(update_fields=['status', 'updated_at'])
+    send_cancellation_to_pro(appointment, request=request)
+    return render(request, 'core/patient_cancelled.html', {
+        'appointment': appointment,
+        'professional': appointment.professional,
+        'patient': appointment.patient,
+    })
+
+
+def patient_reschedule(request, token):
+    appointment = parse_patient_token(token)
+    if not appointment:
+        return render(request, 'core/patient_link_expired.html', status=410)
+    if appointment.status in ('cancelled', 'completed') or _is_window_locked(appointment):
+        return redirect('patient_appointment', token=token)
+
+    professional = appointment.professional
+    working_day_nums = {DAYS_MAP[d] for d in professional.get_working_days_list() if d in DAYS_MAP}
+    available_dates = []
+    for i in range(1, 30):
+        d = date.today() + timedelta(days=i)
+        if d.weekday() in working_day_nums:
+            available_dates.append(d)
+        if len(available_dates) >= 14:
+            break
+
+    selected_date_str = request.GET.get('date') or request.POST.get('date')
+    selected_date = None
+    slots = []
+    if selected_date_str:
+        try:
+            selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+            slots = get_available_slots(professional, selected_date)
+        except ValueError:
+            pass
+
+    if request.method == 'POST' and request.POST.get('time'):
+        try:
+            new_time = datetime.strptime(request.POST['time'], '%H:%M').time()
+        except ValueError:
+            new_time = None
+
+        if selected_date and new_time:
+            taken = Appointment.objects.filter(
+                professional=professional,
+                appointment_date=selected_date,
+                appointment_time=new_time,
+                status__in=['scheduled', 'confirmed'],
+            ).exclude(id=appointment.id).exists()
+
+            if taken:
+                messages.error(request, 'Ese horario acaba de ocuparse. Elegí otro.')
+            else:
+                old_date = appointment.appointment_date
+                old_time = appointment.appointment_time
+                appointment.appointment_date = selected_date
+                appointment.appointment_time = new_time
+                appointment.status = 'scheduled'
+                appointment.save(update_fields=['appointment_date', 'appointment_time', 'status', 'updated_at'])
+                send_reschedule_to_pro(appointment, old_date, old_time, request=request)
+                send_appointment_confirmation(appointment, request=request)
+                messages.success(request, 'Tu turno fue reagendado.')
+                return redirect('patient_appointment', token=token)
+
+    return render(request, 'core/patient_reschedule.html', {
+        'appointment': appointment,
+        'professional': professional,
+        'patient': appointment.patient,
+        'token': token,
+        'available_dates': available_dates,
+        'selected_date': selected_date,
+        'slots': slots,
+    })
 
 
 def public_review(request, slug, token):

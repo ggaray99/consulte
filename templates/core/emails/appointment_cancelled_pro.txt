@@ -1,0 +1,12 @@
+TURNO CANCELADO POR EL PACIENTE
+
+Hola {{ professional.professional_name }},
+
+{{ patient.first_name }} {{ patient.last_name }} canceló su turno desde el link de gestión. El horario quedó libre.
+
+PACIENTE:    {{ patient.first_name }} {{ patient.last_name }}{% if patient.phone %} — {{ patient.phone }}{% endif %}
+FECHA:       {{ appointment.appointment_date|date:"l d/m/Y" }}
+HORA:        {{ appointment.appointment_time|time:"H:i" }} hs
+
+—
+powered by consulte.

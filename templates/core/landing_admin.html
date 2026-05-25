@@ -17,7 +17,24 @@
   .builder .pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 500; }
 </style>
 
-<div class="builder max-w-4xl mx-auto px-6 py-8">
+<style>
+  .preview-pane { position: sticky; top: 80px; }
+  .preview-frame { border: 1px solid #E5E9F0; border-radius: 12px; overflow: hidden; background: #F4F6FA; transition: padding 200ms ease-out; }
+  .preview-frame iframe { display: block; width: 100%; height: calc(100vh - 200px); border: 0; background: #fff; transition: max-width 200ms ease-out, border-radius 200ms ease-out; margin: 0 auto; }
+  .preview-frame.is-mobile { padding: 16px; }
+  .preview-frame.is-mobile iframe { max-width: 390px; border-radius: 20px; box-shadow: 0 4px 20px -8px rgba(11,28,48,.25); }
+  .preview-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .preview-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #6F7E92; font-weight: 500; }
+  .preview-actions { display: flex; gap: 4px; }
+  .preview-btn { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #CBD2DD; border-radius: 6px; background: #fff; color: #4A5A6E; cursor: pointer; transition: all 150ms ease-out; }
+  .preview-btn:hover { border-color: #0047AB; color: #0047AB; }
+  .preview-btn.is-active { background: #F2F5FC; border-color: #0047AB; color: #0047AB; }
+  .preview-btn .material-symbols-outlined { font-size: 18px; }
+  .preview-refresh { font-size: 12px; padding: 0 10px; height: 32px; border: 1px solid #CBD2DD; border-radius: 6px; background: #fff; color: #4A5A6E; cursor: pointer; }
+  .preview-refresh:hover { border-color: #0047AB; color: #0047AB; }
+</style>
+
+<div class="builder max-w-4xl lg:max-w-7xl mx-auto px-6 py-8">
 
     <div class="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
@@ -34,6 +51,9 @@
     <div class="mb-4 p-3 rounded-lg text-sm {% if message.tags == 'success' %}bg-green-50 text-green-700 border border-green-200{% else %}bg-red-50 text-red-700 border border-red-200{% endif %}">{{ message }}</div>
     {% endfor %}
     {% endif %}
+
+    <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_480px] lg:gap-8 lg:items-start">
+    <div class="min-w-0">
 
     {# === APARIENCIA Y VISIBILIDAD === #}
     <details id="settings" open class="bg-white rounded-xl border border-gray-100 shadow-sm mb-4 overflow-hidden">
@@ -590,6 +610,31 @@
     </div>
     {% endif %}
 
+    </div>{# end left col #}
+
+    <aside class="hidden lg:block">
+        <div class="preview-pane">
+            <div class="preview-toolbar">
+                <span class="preview-title">Vista previa</span>
+                <div class="preview-actions">
+                    <button type="button" class="preview-btn is-active" data-mode="desktop" onclick="setPreview('desktop', this)" aria-label="Vista desktop">
+                        <span class="material-symbols-outlined">desktop_windows</span>
+                    </button>
+                    <button type="button" class="preview-btn" data-mode="mobile" onclick="setPreview('mobile', this)" aria-label="Vista mobile">
+                        <span class="material-symbols-outlined">smartphone</span>
+                    </button>
+                    <button type="button" class="preview-refresh" onclick="document.getElementById('previewFrame').src=document.getElementById('previewFrame').src">↻</button>
+                </div>
+            </div>
+            <div id="previewWrap" class="preview-frame">
+                <iframe id="previewFrame" src="{{ public_url }}" title="Vista previa de tu landing" loading="lazy"></iframe>
+            </div>
+            <p class="text-[11px] text-gray-400 mt-2">Se actualiza al guardar cualquier sección. <span class="text-gray-500">Tip:</span> usá ↻ si querés forzar un refresh manual.</p>
+        </div>
+    </aside>
+
+    </div>{# end grid #}
+
 </div>
 
 <script>
@@ -601,6 +646,12 @@ const hash = location.hash.slice(1);
 if (hash) {
   const el = document.getElementById(hash);
   if (el?.tagName === 'DETAILS') { el.open = true; el.scrollIntoView({block: 'start'}); }
+}
+function setPreview(mode, btn) {
+  const wrap = document.getElementById('previewWrap');
+  if (!wrap) return;
+  wrap.className = 'preview-frame' + (mode === 'mobile' ? ' is-mobile' : '');
+  document.querySelectorAll('.preview-btn').forEach(b => b.classList.toggle('is-active', b.dataset.mode === mode));
 }
 </script>
 {% endblock %}

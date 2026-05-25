@@ -33,6 +33,7 @@ from .emails import (
 )
 from .tokens import parse_patient_token
 from django.views.decorators.http import require_POST
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 
 REVIEW_TOKEN_SALT = 'consulte.appointment.review'
@@ -703,6 +704,7 @@ def landing_admin(request):
 
 # --- Public Landing & Booking ---
 
+@xframe_options_sameorigin
 def public_landing(request, slug):
     professional = get_object_or_404(Professional, slug=slug)
 

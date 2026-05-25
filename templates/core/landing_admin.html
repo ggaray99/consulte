@@ -19,18 +19,18 @@
 
 <style>
   .preview-pane { position: sticky; top: 80px; }
-  .preview-frame { border: 1px solid #E5E9F0; border-radius: 12px; overflow: hidden; background: #F4F6FA; transition: padding 200ms ease-out; }
-  .preview-frame iframe { display: block; width: 100%; height: calc(100vh - 200px); border: 0; background: #fff; transition: max-width 200ms ease-out, border-radius 200ms ease-out; margin: 0 auto; }
-  .preview-frame.is-mobile { padding: 16px; }
-  .preview-frame.is-mobile iframe { max-width: 390px; border-radius: 20px; box-shadow: 0 4px 20px -8px rgba(11,28,48,.25); }
-  .preview-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .preview-frame { border: 1px solid #E5E9F0; border-radius: 12px; overflow: hidden; background: #F4F6FA; height: calc(100vh - 200px); position: relative; }
+  .preview-frame iframe { border: 0; display: block; background: #fff; transform-origin: top left; }
+  .preview-frame.is-mobile { display: flex; align-items: flex-start; justify-content: center; padding: 18px 0; }
+  .preview-frame.is-mobile iframe { width: 390px; height: 100%; border: 1px solid #CBD2DD; border-radius: 22px; box-shadow: 0 8px 28px -12px rgba(11,28,48,.25); transform: none; }
+  .preview-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
   .preview-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #6F7E92; font-weight: 500; }
-  .preview-actions { display: flex; gap: 4px; }
-  .preview-btn { width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #CBD2DD; border-radius: 6px; background: #fff; color: #4A5A6E; cursor: pointer; transition: all 150ms ease-out; }
+  .preview-actions { display: inline-flex; gap: 4px; }
+  .preview-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; height: 30px; border: 1px solid #CBD2DD; border-radius: 6px; background: #fff; color: #4A5A6E; cursor: pointer; transition: all 150ms ease-out; font-size: 12px; font-weight: 500; line-height: 1; font-family: inherit; }
   .preview-btn:hover { border-color: #0047AB; color: #0047AB; }
   .preview-btn.is-active { background: #F2F5FC; border-color: #0047AB; color: #0047AB; }
-  .preview-btn .material-symbols-outlined { font-size: 18px; }
-  .preview-refresh { font-size: 12px; padding: 0 10px; height: 32px; border: 1px solid #CBD2DD; border-radius: 6px; background: #fff; color: #4A5A6E; cursor: pointer; }
+  .preview-btn svg { width: 14px; height: 14px; }
+  .preview-refresh { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid #CBD2DD; border-radius: 6px; background: #fff; color: #4A5A6E; cursor: pointer; font-size: 14px; line-height: 1; padding: 0; font-family: inherit; }
   .preview-refresh:hover { border-color: #0047AB; color: #0047AB; }
 </style>
 
@@ -618,12 +618,14 @@
                 <span class="preview-title">Vista previa</span>
                 <div class="preview-actions">
                     <button type="button" class="preview-btn is-active" data-mode="desktop" onclick="setPreview('desktop', this)" aria-label="Vista desktop">
-                        <span class="material-symbols-outlined">desktop_windows</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        Desktop
                     </button>
                     <button type="button" class="preview-btn" data-mode="mobile" onclick="setPreview('mobile', this)" aria-label="Vista mobile">
-                        <span class="material-symbols-outlined">smartphone</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+                        Mobile
                     </button>
-                    <button type="button" class="preview-refresh" onclick="document.getElementById('previewFrame').src=document.getElementById('previewFrame').src">↻</button>
+                    <button type="button" class="preview-refresh" onclick="document.getElementById('previewFrame').contentWindow.location.reload();" aria-label="Refrescar">↻</button>
                 </div>
             </div>
             <div id="previewWrap" class="preview-frame">
@@ -647,11 +649,32 @@ if (hash) {
   const el = document.getElementById(hash);
   if (el?.tagName === 'DETAILS') { el.open = true; el.scrollIntoView({block: 'start'}); }
 }
+const DESKTOP_VIEWPORT = 1280;
+function applyDesktopScale() {
+  const wrap = document.getElementById('previewWrap');
+  if (!wrap || wrap.classList.contains('is-mobile')) return;
+  const iframe = wrap.querySelector('iframe');
+  if (!iframe) return;
+  const w = wrap.clientWidth;
+  const h = wrap.clientHeight;
+  const scale = w / DESKTOP_VIEWPORT;
+  iframe.style.width = DESKTOP_VIEWPORT + 'px';
+  iframe.style.height = (h / scale) + 'px';
+  iframe.style.transform = 'scale(' + scale + ')';
+}
 function setPreview(mode, btn) {
   const wrap = document.getElementById('previewWrap');
   if (!wrap) return;
+  const iframe = wrap.querySelector('iframe');
   wrap.className = 'preview-frame' + (mode === 'mobile' ? ' is-mobile' : '');
   document.querySelectorAll('.preview-btn').forEach(b => b.classList.toggle('is-active', b.dataset.mode === mode));
+  if (mode === 'mobile') {
+    iframe.style.width = ''; iframe.style.height = ''; iframe.style.transform = '';
+  } else {
+    applyDesktopScale();
+  }
 }
+window.addEventListener('load', applyDesktopScale);
+window.addEventListener('resize', applyDesktopScale);
 </script>
 {% endblock %}

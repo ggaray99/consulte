@@ -56,13 +56,12 @@
     <div class="min-w-0">
 
     {# === APARIENCIA Y VISIBILIDAD === #}
-    <details id="settings" open class="bg-white rounded-xl border border-gray-100 shadow-sm mb-4 overflow-hidden">
-        <summary class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+    <details id="settings" class="bg-white rounded-xl border border-gray-100 shadow-sm mb-4 overflow-hidden">
+        <summary class="px-6 py-4 flex items-center hover:bg-gray-50">
             <div class="flex items-center gap-3">
                 <span class="font-semibold">Apariencia y visibilidad</span>
                 <span class="pill" style="background:{{ professional.theme_primary }}20; color:{{ professional.theme_primary }};">{{ professional.theme_primary }}</span>
             </div>
-            <span class="text-xs text-gray-400">Color de marca + qué secciones mostrar</span>
         </summary>
         <form method="post" class="px-6 py-5 space-y-5">
             {% csrf_token %}
@@ -141,11 +140,10 @@
 
     {# === DATOS BÁSICOS === #}
     <details id="basics" class="bg-white rounded-xl border border-gray-100 shadow-sm mb-4 overflow-hidden">
-        <summary class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+        <summary class="px-6 py-4 flex items-center hover:bg-gray-50">
             <div class="flex items-center gap-3">
                 <span class="font-semibold">Datos básicos</span>
             </div>
-            <span class="text-xs text-gray-400">Foto, nombre, especialidad, tagline, bio</span>
         </summary>
         <form method="post" enctype="multipart/form-data" class="px-6 py-5 space-y-5">
             {% csrf_token %}
@@ -228,7 +226,7 @@
 
     {# === REDES SOCIALES === #}
     <details id="social" class="bg-white rounded-xl border border-gray-100 shadow-sm mb-4 overflow-hidden">
-        <summary class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+        <summary class="px-6 py-4 flex items-center hover:bg-gray-50">
             <div class="flex items-center gap-3">
                 <span class="font-semibold">Redes sociales</span>
                 {% if professional.has_social_links %}
@@ -237,7 +235,6 @@
                     <span class="pill bg-gray-100 text-gray-500">sin cargar</span>
                 {% endif %}
             </div>
-            <span class="text-xs text-gray-400">Aparecen como iconos en tu sección de contacto</span>
         </summary>
         <form method="post" class="px-6 py-5 space-y-4">
             {% csrf_token %}
@@ -269,12 +266,11 @@
 
     {# === MISIÓN === #}
     <details id="mission" class="bg-white rounded-xl border border-gray-100 shadow-sm mb-4 overflow-hidden">
-        <summary class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+        <summary class="px-6 py-4 flex items-center hover:bg-gray-50">
             <div class="flex items-center gap-3">
                 <span class="font-semibold">Misión</span>
                 {% if not professional.show_mission %}<span class="pill bg-gray-100 text-gray-500">oculta</span>{% endif %}
             </div>
-            <span class="text-xs text-gray-400">{% if professional.mission %}{{ professional.mission|length }} caracteres{% else %}sin contenido{% endif %}</span>
         </summary>
         <form method="post" class="px-6 py-5">
             {% csrf_token %}
@@ -287,12 +283,11 @@
 
     {# === ESTADÍSTICAS === #}
     <details id="stats" class="bg-white rounded-xl border border-gray-100 shadow-sm mb-4 overflow-hidden">
-        <summary class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+        <summary class="px-6 py-4 flex items-center hover:bg-gray-50">
             <div class="flex items-center gap-3">
                 <span class="font-semibold">Estadísticas</span>
                 {% if not professional.show_stats %}<span class="pill bg-gray-100 text-gray-500">oculta</span>{% endif %}
             </div>
-            <span class="text-xs text-gray-400">{{ stats|length }} item{{ stats|length|pluralize }} · hasta 4 cards</span>
         </summary>
         <div class="px-6 py-5">
             <div class="space-y-2 mb-4">
@@ -329,12 +324,11 @@
 
     {# === CREDENCIALES === #}
     <details id="credentials" class="bg-white rounded-xl border border-gray-100 shadow-sm mb-4 overflow-hidden">
-        <summary class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+        <summary class="px-6 py-4 flex items-center hover:bg-gray-50">
             <div class="flex items-center gap-3">
                 <span class="font-semibold">Credenciales y formación</span>
                 {% if not professional.show_credentials %}<span class="pill bg-gray-100 text-gray-500">oculta</span>{% endif %}
             </div>
-            <span class="text-xs text-gray-400">{{ credentials|length }} item{{ credentials|length|pluralize }}</span>
         </summary>
         <div class="px-6 py-5">
             <p class="text-xs text-gray-400 mb-3">Iconos de <a href="https://fonts.google.com/icons" target="_blank" class="text-primary-600 hover:underline">Material Symbols</a>. Sugeridos: <code>school</code>, <code>workspace_premium</code>, <code>clinical_notes</code>, <code>verified</code>.</p>
@@ -373,12 +367,11 @@
 
     {# === SERVICIOS === #}
     <details id="services" class="bg-white rounded-xl border border-gray-100 shadow-sm mb-4 overflow-hidden">
-        <summary class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+        <summary class="px-6 py-4 flex items-center hover:bg-gray-50">
             <div class="flex items-center gap-3">
                 <span class="font-semibold">Servicios</span>
                 {% if not professional.show_services %}<span class="pill bg-gray-100 text-gray-500">oculta</span>{% endif %}
             </div>
-            <span class="text-xs text-gray-400">{{ services|length }} item{{ services|length|pluralize }}</span>
         </summary>
         <div class="px-6 py-5">
             <p class="text-xs text-gray-400 mb-3">Iconos sugeridos: <code>monitor_heart</code>, <code>medical_services</code>, <code>video_chat</code>, <code>psychology</code>, <code>health_and_safety</code>.</p>
@@ -505,13 +498,12 @@
 
     {# === TESTIMONIOS === #}
     <details id="testimonials" {% if pending_testimonials %}open{% endif %} class="bg-white rounded-xl border border-gray-100 shadow-sm mb-4 overflow-hidden">
-        <summary class="px-6 py-4 flex items-center justify-between hover:bg-gray-50">
+        <summary class="px-6 py-4 flex items-center hover:bg-gray-50">
             <div class="flex items-center gap-3">
                 <span class="font-semibold">Testimonios</span>
                 {% if not professional.show_testimonials %}<span class="pill bg-gray-100 text-gray-500">oculta</span>{% endif %}
                 {% if pending_testimonials %}<span class="pill bg-amber-100 text-amber-700">{{ pending_testimonials|length }} pendiente{{ pending_testimonials|length|pluralize }}</span>{% endif %}
             </div>
-            <span class="text-xs text-gray-400">{{ testimonials|length }} publicada{{ testimonials|length|pluralize }}</span>
         </summary>
         <div class="px-6 py-5">
 
@@ -655,5 +647,64 @@ function setPreview(mode, btn) {
   wrap.className = 'preview-frame' + (mode === 'mobile' ? ' is-mobile' : '');
   document.querySelectorAll('.preview-btn').forEach(b => b.classList.toggle('is-active', b.dataset.mode === mode));
 }
+
+// Toast helper
+function showToast(msg, kind) {
+  let t = document.getElementById('saveToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'saveToast';
+    t.style.cssText = 'position:fixed;top:80px;right:24px;color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:500;box-shadow:0 10px 30px -10px rgba(0,0,0,.2);z-index:60;opacity:0;transform:translateY(-8px);transition:opacity 200ms ease-out,transform 200ms ease-out;pointer-events:none;font-family:inherit;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.background = kind === 'error' ? '#C8362F' : '#1E9E63';
+  t.style.opacity = '1';
+  t.style.transform = 'translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateY(-8px)';
+  }, 1800);
+}
+
+// Intercept editor form submits: _save → reload only the iframe; _add / _delete / _approve → full reload
+(function() {
+  const builder = document.querySelector('.builder');
+  const previewFrame = document.getElementById('previewFrame');
+  if (!builder || !previewFrame) return;
+
+  builder.addEventListener('submit', async (e) => {
+    const form = e.target;
+    if (!form || form.tagName !== 'FORM') return;
+
+    const fd = new FormData(form);
+    const submitter = e.submitter;
+    if (submitter && submitter.name) fd.set(submitter.name, submitter.value);
+    const action = (fd.get('action') || '').toString();
+    const needsFullReload = action.endsWith('_add') || action.endsWith('_delete') || action === 'testimonial_approve';
+
+    e.preventDefault();
+    try {
+      const resp = await fetch(form.action || window.location.pathname, {
+        method: 'POST',
+        body: fd,
+        redirect: 'manual',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      });
+      const ok = resp.ok || resp.type === 'opaqueredirect' || resp.status === 0;
+      if (!ok) throw new Error('HTTP ' + resp.status);
+
+      if (needsFullReload) {
+        window.location.reload();
+      } else {
+        previewFrame.contentWindow.location.reload();
+        showToast('Guardado');
+      }
+    } catch (err) {
+      showToast('Error al guardar', 'error');
+    }
+  });
+})();
 </script>
 {% endblock %}

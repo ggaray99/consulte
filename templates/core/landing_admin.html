@@ -20,9 +20,9 @@
 <style>
   .preview-pane { position: sticky; top: 80px; }
   .preview-frame { border: 1px solid #E5E9F0; border-radius: 12px; overflow: hidden; background: #F4F6FA; height: calc(100vh - 200px); position: relative; }
-  .preview-frame iframe { border: 0; display: block; background: #fff; transform-origin: top left; }
+  .preview-frame iframe { border: 0; display: block; background: #fff; width: 100%; height: 100%; }
   .preview-frame.is-mobile { display: flex; align-items: flex-start; justify-content: center; padding: 18px 0; }
-  .preview-frame.is-mobile iframe { width: 390px; height: 100%; border: 1px solid #CBD2DD; border-radius: 22px; box-shadow: 0 8px 28px -12px rgba(11,28,48,.25); transform: none; }
+  .preview-frame.is-mobile iframe { width: 390px; height: 100%; border: 1px solid #CBD2DD; border-radius: 22px; box-shadow: 0 8px 28px -12px rgba(11,28,48,.25); }
   .preview-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
   .preview-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #6F7E92; font-weight: 500; }
   .preview-actions { display: inline-flex; gap: 4px; }
@@ -34,7 +34,7 @@
   .preview-refresh:hover { border-color: #0047AB; color: #0047AB; }
 </style>
 
-<div class="builder max-w-4xl lg:max-w-7xl mx-auto px-6 py-8">
+<div class="builder max-w-4xl lg:max-w-[1600px] mx-auto px-6 py-8">
 
     <div class="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
@@ -52,7 +52,7 @@
     {% endfor %}
     {% endif %}
 
-    <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_480px] lg:gap-8 lg:items-start">
+    <div class="lg:grid lg:grid-cols-[minmax(320px,3fr)_minmax(0,7fr)] lg:gap-8 lg:items-start">
     <div class="min-w-0">
 
     {# === APARIENCIA Y VISIBILIDAD === #}
@@ -649,32 +649,11 @@ if (hash) {
   const el = document.getElementById(hash);
   if (el?.tagName === 'DETAILS') { el.open = true; el.scrollIntoView({block: 'start'}); }
 }
-const DESKTOP_VIEWPORT = 1280;
-function applyDesktopScale() {
-  const wrap = document.getElementById('previewWrap');
-  if (!wrap || wrap.classList.contains('is-mobile')) return;
-  const iframe = wrap.querySelector('iframe');
-  if (!iframe) return;
-  const w = wrap.clientWidth;
-  const h = wrap.clientHeight;
-  const scale = w / DESKTOP_VIEWPORT;
-  iframe.style.width = DESKTOP_VIEWPORT + 'px';
-  iframe.style.height = (h / scale) + 'px';
-  iframe.style.transform = 'scale(' + scale + ')';
-}
 function setPreview(mode, btn) {
   const wrap = document.getElementById('previewWrap');
   if (!wrap) return;
-  const iframe = wrap.querySelector('iframe');
   wrap.className = 'preview-frame' + (mode === 'mobile' ? ' is-mobile' : '');
   document.querySelectorAll('.preview-btn').forEach(b => b.classList.toggle('is-active', b.dataset.mode === mode));
-  if (mode === 'mobile') {
-    iframe.style.width = ''; iframe.style.height = ''; iframe.style.transform = '';
-  } else {
-    applyDesktopScale();
-  }
 }
-window.addEventListener('load', applyDesktopScale);
-window.addEventListener('resize', applyDesktopScale);
 </script>
 {% endblock %}
